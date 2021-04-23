@@ -24,7 +24,9 @@ In order to install the dependencies for the system:
 pip3 install -r requirements.txt
 ```
 In  order to run the code :
-`python3 predict.py -c config.json -i /path/to/image/or/video or 'webcam'`
+```
+python3 predict.py -c config.json -i /path/to/image/or/video or 'webcam'
+```
 
 In order for the system to use the GPU, CUDA needs to be installed beforehand.
 
