@@ -15,11 +15,17 @@ VOC format. This code also resizes images by half their dimensions on each axis.
 
 <b>Models</b>  folder contains additional models trained for the DAVROS system.  
 
+Current person.h5 model achives a mAP of 93% when evaluated on the INRIA Person test set.
+
 <b>LICENSE</b> file contains the original licence from the YOLOv3 implementation by Huynh Ngoc Anh. 
 
 In order to install the dependencies for the system:
 ```
 pip install -r requirements.txt
 ```
+In  order to run the code :
+`python predict.py -c config.json -i /path/to/image/or/video`
 
+The distance between individuals in the same group can be adjusted, currently it is set you use the average height of the bouding boxes scaled by the average height of a person globally divided by 200cm. However, this distance can be set manually, in terms of pixels within the image.
 
+The number of people per group before they are flagged as breaking the rule can also be adjusted, the system is currently designed to detect groups of more than six.
