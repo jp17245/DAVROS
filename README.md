@@ -7,9 +7,9 @@ The original YOLOv3: https://pjreddie.com/darknet/yolo/
 Convert.py - is used to convert annotations from PASCAL Annotations version 1.0 to PASCAL  
 VOC format. This code also resizes images by half their dimensions on each axis. This was used to reduce the training time of the model.
 
- <b>predict.py</b> - Modified from YOLOv3 by Huynh Ngoc Anh 
-<b>utlils/bbox.py</b>-  Modified from YOLOv3 by Huynh Ngoc Anh 
-<b>config.json</b> -  Modified from YOLOv3 by Huynh Ngoc Anh 
+ <b>predict.py</b> - Modified from YOLOv3 by Huynh Ngoc Anh <br />
+<b>utlils/bbox.py</b>-  Modified from YOLOv3 by Huynh Ngoc Anh <br />
+<b>config.json</b> -  Modified from YOLOv3 by Huynh Ngoc Anh <br />
 
 <b>INRIAPerson</b> folder contains the entire INRIA Person dataset. Found here: http://pascal.inrialpes.fr/data/human/. Inside the ‘Test’ and ‘Train’ folder are two additional folders created for the DAVROS system. The ‘Small’  test or train folder contains the resized versions of the original images contained in the ‘pos’ folders. The ‘SmallAnnot’ folders contain the reformatted annotations with the adjusted positions and sizes of the image.
 
