@@ -4,7 +4,7 @@ The DAVROS system aims to detect and group individuals for use in verifying the 
 
 The original YOLOv3: https://pjreddie.com/darknet/yolo/
 
-Convert.py - is used to convert annotations from PASCAL Annotations version 1.0 to PASCAL  
+<b>Convert.py</b> - is used to convert annotations from PASCAL Annotations version 1.0 to PASCAL  
 VOC format. This code also resizes images by half their dimensions on each axis. This was used to reduce the training time of the model.
 
  <b>predict.py</b> - Modified from YOLOv3 by Huynh Ngoc Anh <br />
