@@ -15,7 +15,7 @@ VOC format. This code also resizes images by half their dimensions on each axis.
 
 <b>Models</b>  folder contains additional models trained for the DAVROS system.  
 
-<b>LICENSE</b> file contained the original licence from the YOLOv3 implementation by Huynh Ngoc Anh. 
+<b>LICENSE</b> file contains the original licence from the YOLOv3 implementation by Huynh Ngoc Anh. 
 
 In order to install the dependencies for the system:
 ```
