@@ -7,7 +7,7 @@ The original YOLOv3: https://pjreddie.com/darknet/yolo/
 Convert.py - is used to convert annotations from PASCAL Annotations version 1.0 to PASCAL  
 VOC format. This code also resizes images by half their dimensions on each axis. This was used to reduce the training time of the model.
 
-Precict.py - Modified from YOLOv3 by Huynh Ngoc Anh 
+##Precict.py ##- Modified from YOLOv3 by Huynh Ngoc Anh 
 utlils/bbox.py-  Modified from YOLOv3 by Huynh Ngoc Anh 
 config.json -  Modified from YOLOv3 by Huynh Ngoc Anh 
 
