@@ -33,3 +33,4 @@ In order for the system to use the GPU, CUDA needs to be installed beforehand.
 The distance between individuals in the same group can be adjusted, currently it is set you use the average height of the bouding boxes scaled by the average height of a person globally divided by 200cm. However, this distance can be set manually, in terms of pixels within the image.
 
 The number of people per group before they are flagged as breaking the rule can also be adjusted, the system is currently designed to detect groups of more than six.
+# DAVROS
