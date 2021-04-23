@@ -1,0 +1,25 @@
+def is_dense_tensor_like(t):
+  return isinstance(t, core_tf_types.Tensor)
+
+
+from tensorflow.python.types import core as core_tf_types
+
+
+
+existing manager installation driver found
+
+
+
+
+ -   PATH includes /usr/local/cuda-11.1/bin
+ -   LD_LIBRARY_PATH includes /usr/local/cuda-11.1/lib64, or, add /usr/local/cuda-11.1/lib64 to /etc/ld.so.conf and run ldconfig as root
+
+/usr/local/cuda-11.2/targets/x86_64-linux/lib/libcudart.so.11.0
+
+
+export LD_LIBRARY_PATH=/usr/local/cuda-11.1/targets/x86_64-linux/lib/libcudart.so.11.0${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+
+
+
+export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+

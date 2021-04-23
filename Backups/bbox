@@ -1,0 +1,213 @@
+import numpy as np
+import os
+import cv2
+from .colors import get_color
+
+
+class BoundBox:
+    def __init__(self, xmin, ymin, xmax, ymax, c = None, classes = None):
+        self.xmin = xmin
+        self.ymin = ymin
+        self.xmax = xmax
+        self.ymax = ymax
+        
+        self.c       = c
+        self.classes = classes
+
+        self.label = -1
+        self.score = -1
+
+    def get_label(self):
+        if self.label == -1:
+            self.label = np.argmax(self.classes)
+        
+        return self.label
+    
+    def get_score(self):
+        if self.score == -1:
+            self.score = self.classes[self.get_label()]
+            
+        return self.score      
+
+def _interval_overlap(interval_a, interval_b):
+    x1, x2 = interval_a
+    x3, x4 = interval_b
+
+    if x3 < x1:
+        if x4 < x1:
+            return 0
+        else:
+            return min(x2,x4) - x1
+    else:
+        if x2 < x3:
+             return 0
+        else:
+            return min(x2,x4) - x3    
+
+def bbox_iou(box1, box2):
+    intersect_w = _interval_overlap([box1.xmin, box1.xmax], [box2.xmin, box2.xmax])
+    intersect_h = _interval_overlap([box1.ymin, box1.ymax], [box2.ymin, box2.ymax])  
+    
+    intersect = intersect_w * intersect_h
+
+    w1, h1 = box1.xmax-box1.xmin, box1.ymax-box1.ymin
+    w2, h2 = box2.xmax-box2.xmin, box2.ymax-box2.ymin
+    
+    union = w1*h1 + w2*h2 - intersect
+    
+    return float(intersect) / union
+
+
+def assignGroups(groups,xmin,ymin,xmax,ymax,groupNum,broken):
+
+    centre_x = xmin + ((xmax - xmin) / 2)  # centre of new person
+    centre_y = ymin + ((ymax - ymin) / 2)
+
+    grouped=False
+    change=False
+    Final=False
+    counter=-1
+    hasGroup = True
+    groupToAddto=0
+    storeCount=0
+   # groupNum=-6
+    posTarget=0
+    please=False
+
+    class BreakIt(Exception): pass
+
+    try:
+        for x in groups:
+            groupPosCounter = -1
+            counter = counter + 1
+            # if (len(x) > 6) or ( counter ==0 and len(x)>5) :
+            #     print("Broken Rule by: Group ",counter)
+            #     broken.append(counter)
+            # print("?///////////////////////////////////////////////////////////")
+            # print(groups[counter])
+
+            for i in groups[counter]:
+                posTarget = 0
+                groupPosCounter = groupPosCounter + 1
+                #print("i",i, " - ",counter)
+
+                newGroup=False
+                #print("length",len(groups[counter]))
+                centre_x=xmin +( (xmax-xmin)/2) #centre of new person
+                centre_y=ymin+ ((ymax-ymin)/2)
+
+                area_new = (xmax-xmin) * (ymax-ymin)
+
+                group_centre_x= int(i[0])+((int(i[2])- int(i[0])) /2)
+                group_centre_y = int(i[1]) + ((int(i[3]) - int(i[1])) / 2)
+                area_old =(i[2] -i[0]) * (i[3] - i[1])
+
+
+                # if (centre_x >(group_centre_x -40)) and (centre_x< (group_centre_x +40)) and (centre_y >(group_centre_y -40)) and (centre_y<(group_centre_y +40)): # Values need to be ajsuted to scale with image size
+
+                if ((abs(centre_x-group_centre_x)<40) and (abs(centre_y-group_centre_y)<40)):
+                    hasGroup =False
+                    grouped =True
+                    groupNum=counter
+                    posTarget=groupPosCounter
+                    countingppl = 0
+                    if ((len(groups[counter])) > 1):
+                        print("entered")
+                        storeCount=0
+                        for d in groups[counter]:
+                             if (storeCount != posTarget):
+                                 group_centre_x_check = int(d[0]) + ((int(d[2]) - int(d[0])) / 2)
+                                 group_centre_y_check = int(d[1]) + ((int(d[3]) - int(d[1])) / 2)
+                                 storeCount = storeCount + 1
+                                 if (abs(centre_x - group_centre_x_check) < 50) and (abs(centre_y - group_centre_y_check) < 50) :
+                                    countingppl = countingppl +1
+                                 if(countingppl != (len(groups[counter]))-1):
+                                    change=True
+                                    hasGroup=True
+                        if (countingppl == len(groups[counter])-1):
+                            groups[counter][groupPosCounter ] = [xmin, ymin, xmax, ymax]
+                    else:
+                        groups[counter][groupPosCounter] = [xmin, ymin, xmax, ymax]
+
+
+
+                else:
+                    if hasGroup==True and grouped==False and change ==False:
+                        if (abs(centre_x - group_centre_x) < 80) and (abs(centre_y - group_centre_y) < 80): #and (((area_new / area_old) < 3.0) and (area_new / area_old) > 0.0)): # Values again need to scale
+                            groupToAddto=counter
+                            if(grouped ==False):
+
+                                groups[groupToAddto].append([xmin, ymin, xmax, ymax])
+                            groupNum=groupToAddto
+                            grouped = True
+                            raise BreakIt
+
+    except BreakIt:
+        pass
+    if(grouped==False and hasGroup ==True) or (change ==True and hasGroup ==True):
+        groups.append([])
+        groups[len(groups)-1].append([xmin,ymin,xmax,ymax]) # adding group
+        groupNum = len(groups)-1
+
+    print(groups)
+    return groupNum
+    # if the box boundary near each other and the  area of bounding box is near equal.
+
+
+
+
+
+def draw_boxes(image, boxes, labels, obj_thresh,count,groups,quiet=True):
+    broken=[]
+
+    for box in boxes:
+        label_str = ''
+        label = -1
+        groupNum = 0
+        for i in range(len(labels)):
+            if box.classes[i] > obj_thresh:
+                if label_str != '': label_str += ', '
+                label_str += (labels[i] + ' ' + str(round(box.get_score()*100, 2)) + '%')
+                label = i
+            if not quiet: print(label_str)
+                
+        if label >= 0:
+
+            secondPos = int((box.xmax - box.xmin))
+            text_size = cv2.getTextSize("Group", cv2.FONT_HERSHEY_SIMPLEX, 1.1e-3 * image.shape[0]/2, 5)
+            width, height = (box.xmax-box.xmin), ((box.ymax-box.ymin))
+            region = np.array([[box.xmin-3,        box.ymin],
+                               [box.xmin-3,        box.ymin-height-5],
+                               [box.xmin+width+13, box.ymin-height-5],
+                               [box.xmin+width+13, box.ymin]], dtype='int32')
+
+            regionRule = np.array([[box.xmin , box.ymin],
+                               [box.xmin , box.ymin - height/12],
+                               [box.xmin + width , box.ymin - height/12],
+                               [box.xmin + width , box.ymin]], dtype='int32')
+            count = count + 1
+            if count ==1:
+                groups[0][0] = [box.xmin, box.ymin, box.xmax, box.ymax]
+                groupNum=0
+                cv2.rectangle(img=image, pt1=(box.xmin,box.ymin), pt2=(box.xmax,box.ymax), color=get_color(groupNum), thickness=2)
+
+            elif count > 1 :
+
+                groupNum = assignGroups(groups,box.xmin,box.ymin,box.xmax,box.ymax,groupNum,broken)
+
+                cv2.rectangle(img=image, pt1=(box.xmin, box.ymin), pt2=(box.xmax, box.ymax), color=get_color(groupNum), thickness=2)
+
+
+            cv2.fillPoly(img=image, pts=[regionRule], color=get_color(groupNum)) # Used for filling rectangle above box in which label is printed on top of. To make it stand out
+
+            cv2.putText(img=image, text="Group " + str(groupNum), org=(box.xmin+5, box.ymin - 3), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1e-2 * (width*0.6),color=(0,0,0), thickness=1) # Prints the label of detected object. Eg Person
+            # if groupNum in broken:
+            #     for i in groups[groupNum]:
+            #         posx = (i[2]-i[0])/2
+            #         posy= (i[3]-i[1])/2
+            #         cv2.putText(img=image, text="Broke", org=(int(i[0]+posx-15), int(i[1]+posy-30)),fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1e-3 * image.shape[0], color=(0, 0, 0),thickness=1)
+            #         cv2.putText(img=image, text="Rule",org=(int(i[0] + posx-12), int(i[1] + posy-20)), fontFace=cv2.FONT_HERSHEY_SIMPLEX,fontScale=1e-3 * image.shape[0], color=(0, 0, 0), thickness=1)
+
+            #cv2.putText(img=image, text="Group " + str(groupNum), org=(box.xmin + 13, box.ymin - 13),fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1e-3 * image.shape[0], color=(0, 0, 0),thickness=2)  # Prints the label of de
+    return image,count,groups
+

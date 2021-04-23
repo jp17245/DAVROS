@@ -1,0 +1,44 @@
+{
+    "model" : {
+        "min_input_size":       176,
+        "max_input_size":       1280,
+        "anchors":              [39,59, 80,82, 85,234, 139,332, 146,135, 191,195, 203,293, 305,344, 306,225], // Original Model person_train.h
+        //"anchors":            [26,89, 36,137, 45,196, 56,143, 61,244, 84,193, 85,303, 118,238, 160,293], // For new model trained on BC4
+        "labels":               ["person"]
+    },
+
+    "train": {
+        "train_image_folder":   "/home/doubleitbytwo/Documents/UNI/4th-Year-Project-Jp17245/INRIAPerson/Train/pos/",
+        "train_annot_folder":   "/home/doubleitbytwo/Documents/UNI/4th-Year-Project-Jp17245/VocAnnots/",
+        "cache_name":           "person_train.pkl",
+
+        "train_times":          32,
+        "batch_size":           16,
+        "learning_rate":        1e-4,
+        "nb_epochs":            5,
+        "warmup_epochs":        3,
+        "ignore_thresh":        0.5,
+        "gpus":                 "0",
+
+        "grid_scales":          [1,1,1],
+        "obj_scale":            5,
+        "noobj_scale":          1,
+        "xywh_scale":           1,
+        "class_scale":          1,
+
+        "tensorboard_dir":      "logs",
+        "saved_weights_name":   "person.h5",
+        "debug":                true
+    },
+
+    "valid": {
+        "valid_image_folder":   "",
+        "valid_annot_folder":   "",
+        "cache_name":           "",
+
+        "valid_times":          1
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
