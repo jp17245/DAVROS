@@ -1,3 +1,4 @@
+# Original code by Huynh Ngoc Anh. Modified by student. Assign Group functions are new for the DAVROS system. DrawBoxes modified from original code.
 import numpy as np
 import os
 import cv2
